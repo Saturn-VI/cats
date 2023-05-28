@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from os import getenv
 from time import sleep
 from random import randint
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 
 load_dotenv()
 
@@ -72,12 +72,16 @@ index_length = len(submissions)
 def main():
     return render_template('index.html')
 
-@app.route("/api")
+@app.route("/api", methods=['GET'])
 def api():
-    random_number = randint(0, index_length)
-    submission_choice = submission_ids[random_number]
-    submission_title_choice = submission_titles[random_number]
-    return jsonify({'URL':submission_choice, 'TITLE':submission_title_choice})
+    if(request.method == 'GET'):
+        random_number = randint(0, ((index_length)))
+        print(index_length)
+        print(len(submissions))
+        submission_choice = submissions[random_number]
+        submission_title_choice = submission_titles[random_number]
+        return jsonify({'URL':submission_choice, 'TITLE':submission_title_choice})
+
 
 if __name__ == "__main__":
     app.run(host = '127.0.0.1', port = 5050)
