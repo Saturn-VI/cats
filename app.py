@@ -25,37 +25,34 @@ reddit = praw.Reddit(
 
 subreddits = ['cats', 'OneOrangeBraincell', 'CatPics', 'CatLoaf']
 
-submissions = []
-submission_titles = []
-submission_ids = []
+submissions = [] 
+
+class Submission:
+    def __init__(self, url, title):
+        self.url = url
+        self.title = title
+    def __str__(self):
+        return f" Url: {self.url} \n Title: {self.title}"
 
 def get_cats(subreddit_choice):
     if subreddit_choice == '':
         subreddit_choice = subreddits[randint(0, 3)]    
     subreddit = reddit.subreddit(subreddit_choice)
 
-    #submissions = []
-    #submission_titles = []
-    #submission_ids = []
-
-    for submission in subreddit.top(time_filter = "day"):
-        filtered_submission = reddit.submission(submission).url
+    for result in subreddit.top(time_filter = "day"):
+        url = reddit.submission(result).url
         print(subreddit)
-        print(submission)
-        print(submission.title)
-        print(filtered_submission)
-        submissions.append(filtered_submission)
-        submission_titles.append(submission.title)
-        submission_ids.append(submission)
+        print(result)
+        print(result.title)
+        print(url)
+        submission = Submission(url, result.title)
+        submissions.append(submission)
 
     index_length = randint(0,len(submissions)-1)
     #print(index_length)
     #print(submissions)
     #print(submission_ids)
     #print(submission_titles)
-
-    for i in range (10):
-        print('')
 
 
 app = Flask(__name__, static_folder='static')
@@ -64,15 +61,11 @@ app = Flask(__name__, static_folder='static')
 #get_cats('OneOrangeBraincell')
 get_cats('CatPics')
 #get_cats('CatLoaf')
-submission_ids = []
+
+submissions = [s for s in submissions if 'gallery' not in s.url]
 
 for submission in submissions:
-    if 'gallery' in submission:
-        print(submission)
-        submissions.remove(submission)
-        submission_titles.remove(submission)
-
-print(submissions)
+    print(submission.url)
 
 index_length = len(submissions)
 
@@ -84,9 +77,12 @@ def main():
 def api():
     if(request.method == 'GET'):
         random_number = randint(0, ((index_length)-1))
-        submission_choice = submissions[random_number]
-        submission_title_choice = submission_titles[random_number]
-        return {'url':submission_choice, 'title':submission_title_choice}
+        submission_url_choice = submissions[random_number].url
+        submission_title_choice = submissions[random_number].title
+        print('\n\n')
+        print(submission_title_choice)
+        print(submission_url_choice)
+        return {'url':submission_url_choice, 'title':submission_title_choice}
 
 
 if __name__ == "__main__":
