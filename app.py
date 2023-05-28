@@ -72,14 +72,12 @@ index_length = len(submissions)
 def main():
     return render_template('index.html')
 
-if __name__ == "__main__":
-    app.run(host = '127.0.0.1', port = 5050)
-
-
-@app.route("/api", methods=['GET'])
+@app.route("/api")
 def api():
     random_number = randint(0, index_length)
     submission_choice = submission_ids[random_number]
     submission_title_choice = submission_titles[random_number]
-    return_value = {'URL':submission_choice, 'TITLE':submission_title_choice}
-    return jsonify(return_value)
+    return jsonify({'URL':submission_choice, 'TITLE':submission_title_choice})
+
+if __name__ == "__main__":
+    app.run(host = '127.0.0.1', port = 5050)
