@@ -1,8 +1,23 @@
+document.getElementById('image').addEventListener(onclick, async function () {
+        let data = await fetch(current_url);
+        const blob = await data.blob();
+        await navigator.clipboard.write()([
+            new ClipboardItem({
+                [blob.type]: blob
+            })
+        ]);
+
+    }
+);
+
+let current_url = '';
+
 function reqlistener() {
     console.log(this.responseText);
     let post = JSON.parse(this.responseText);
     document.getElementById('title').innerHTML = post.title;
     document.getElementById('image').src = post.url;
+    current_url = post.url;
     document.getElementById('main').innerHTML = document.getElementById('main').innerHTML;
     document.getElementById('main').style.visibility = 'visible';
 }
