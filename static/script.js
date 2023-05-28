@@ -2,11 +2,13 @@ function reqlistener() {
     console.log(this.responseText);
     let post = JSON.parse(this.responseText);
     document.getElementById('title').innerHTML = post.title;
-    document.getElementById('image').src = post.url
+    document.getElementById('image').src = post.url;
+    document.getElementById('main').style.visibility = 'visible';
 }
 
 function httpGet(theUrl)
 {
+    document.getElementById('main').style.visibility = 'hidden';
     var req = new XMLHttpRequest();
     req.addEventListener('load', reqlistener);
     req.open( "GET", theUrl, true );
