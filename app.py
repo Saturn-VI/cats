@@ -32,7 +32,7 @@ class Submission:
         self.url = url
         self.title = title
     def __str__(self):
-        return f" Url: {self.url} \n Title: {self.title}"
+        return f"Url: {self.url}\nTitle: {self.title}"
 
 def get_cats(subreddit_choice):
     if subreddit_choice == '':
@@ -49,10 +49,6 @@ def get_cats(subreddit_choice):
         submissions.append(submission)
 
     index_length = randint(0,len(submissions)-1)
-    #print(index_length)
-    #print(submissions)
-    #print(submission_ids)
-    #print(submission_titles)
 
 
 app = Flask(__name__, static_folder='static')
@@ -64,8 +60,10 @@ get_cats('CatPics')
 
 submissions = [s for s in submissions if 'gallery' not in s.url]
 
+print('\n\n\n\n<----------------------------------------------------->\n\n\n\n')
+
 for submission in submissions:
-    print(submission.url)
+    print(submission)
 
 index_length = len(submissions)
 
