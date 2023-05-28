@@ -65,7 +65,15 @@ app = Flask(__name__, static_folder='static')
 get_cats('CatPics')
 #get_cats('CatLoaf')
 submission_ids = []
-    
+
+for submission in submissions:
+    if 'gallery' in submission:
+        print(submission)
+        submissions.remove(submission)
+        submission_titles.remove(submission)
+
+print(submissions)
+
 index_length = len(submissions)
 
 @app.route("/")
