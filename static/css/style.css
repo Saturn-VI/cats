@@ -1,0 +1,15 @@
+body {
+    background-color: #222222;
+    color: #EEEEEE;
+    text-align: center;
+}
+
+#upvote {
+    background-color: #222222;
+    border-radius: 5px;
+    height: 10dvh;
+    aspect-ratio: 2/1;
+    color: #EEEEEE;
+    font-size: 1.5em;
+}
+

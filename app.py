@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from os import getenv
 from time import sleep
 from random import randint
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 
 load_dotenv()
 
@@ -29,13 +29,14 @@ submissions = []
 submission_titles = []
 submission_ids = []
 
-def get_cats():
-    subreddit_choice = subreddits[randint(0, 3)]
+def get_cats(subreddit_choice):
+    if subreddit_choice == '':
+        subreddit_choice = subreddits[randint(0, 3)]    
     subreddit = reddit.subreddit(subreddit_choice)
 
-    submissions = []
-    submission_titles = []
-    submission_ids = []
+    #submissions = []
+    #submission_titles = []
+    #submission_ids = []
 
     for submission in subreddit.top(time_filter = "day"):
         filtered_submission = reddit.submission(submission).url
@@ -48,20 +49,37 @@ def get_cats():
         submission_ids.append(submission)
 
     index_length = randint(0,len(submissions)-1)
-    print(index_length)
-    print(submissions)
-    print(submission_ids)
-    print(submission_titles)
+    #print(index_length)
+    #print(submissions)
+    #print(submission_ids)
+    #print(submission_titles)
 
     for i in range (10):
         print('')
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
+
+#get_cats('cats')
+#get_cats('OneOrangeBraincell')
+get_cats('CatPics')
+#get_cats('CatLoaf')
+submission_ids = []
+    
+index_length = len(submissions)
 
 @app.route("/")
 def main():
     return render_template('index.html')
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host = '127.0.0.1', port = 5050)
+
+
+@app.route("/api", methods=['GET'])
+def api():
+    random_number = randint(0, index_length)
+    submission_choice = submission_ids[random_number]
+    submission_title_choice = submission_titles[random_number]
+    return_value = {'URL':submission_choice, 'TITLE':submission_title_choice}
+    return jsonify(return_value)
