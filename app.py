@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from os import getenv
 from time import sleep
 from random import randint
+from flask import Flask, render_template
 
 load_dotenv()
 
@@ -23,6 +24,10 @@ reddit = praw.Reddit(
 )
 
 subreddits = ['cats', 'OneOrangeBraincell', 'CatPics', 'CatLoaf']
+
+submissions = []
+submission_titles = []
+submission_ids = []
 
 def get_cats():
     subreddit_choice = subreddits[randint(0, 3)]
@@ -48,9 +53,15 @@ def get_cats():
     print(submission_ids)
     print(submission_titles)
 
+    for i in range (10):
+        print('')
 
-while (1):
-    
-    get_cats()
 
-    input()
+app = Flask(__name__)
+
+@app.route("/")
+def main():
+    return render_template('index.html')
+
+if __name__ == "__main__":
+    app.run()
