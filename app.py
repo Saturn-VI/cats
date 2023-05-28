@@ -75,9 +75,7 @@ def main():
 @app.route("/api", methods=['GET'])
 def api():
     if(request.method == 'GET'):
-        random_number = randint(0, ((index_length)))
-        print(index_length)
-        print(len(submissions))
+        random_number = randint(0, ((index_length)-1))
         submission_choice = submissions[random_number]
         submission_title_choice = submission_titles[random_number]
         return jsonify({'URL':submission_choice, 'TITLE':submission_title_choice})
