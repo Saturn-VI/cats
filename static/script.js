@@ -3,6 +3,7 @@ function reqlistener() {
     let post = JSON.parse(this.responseText);
     document.getElementById('title').innerHTML = post.title;
     document.getElementById('image').src = post.url;
+    document.getElementById('main').innerHTML = document.getElementById('main').innerHTML;
     document.getElementById('main').style.visibility = 'visible';
 }
 
