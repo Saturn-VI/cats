@@ -34,12 +34,13 @@ class Submission:
     def __str__(self):
         return f"Url: {self.url}\nTitle: {self.title}"
 
-outputs = []
 
 def get_cats(subreddit_name, limit=None):
     """ Returns a list of submission objects, with top submissions from the past 24 hours from subreddit_name
     If **limit** is provided, then returns no more then that many items"""
     subreddit = reddit.subreddit(subreddit_name)
+
+    output = set()
 
     for result in subreddit.top(time_filter = "day", limit=limit):
         url = reddit.submission(result).url
@@ -48,8 +49,10 @@ def get_cats(subreddit_name, limit=None):
         print(result.title)
         print(url)
         if filtered_keywords[0] not in url and filtered_keywords[1] not in url:
-            outputs.append(Submission(url, result.title))
-    return outputs
+            output.add(Submission(url, result.title))
+    print(type(output))
+    print(len(output))
+    return output
 
 
 DEFAULT_SUBS = ['cats', 'OneOrangeBraincell', 'CatPics', 'CatLoaf', 'C_AT', 
@@ -63,9 +66,9 @@ print('\n\n\n\n<----------------------------------------------------->\n\n\n\n')
 #---------------------
 
 @click.command()
-@click.option("--subs", default=None, help="Explicit list of subreddits to use. Format: subreddit1, subreddit2, subreddit3, etc")
+@click.option("--subs", default=None, help="Explicit list of subreddits to use. Format: subreddit1,subreddit2,subreddit3, etc. NO SPACES.")
 @click.option("-f", "--filename", default="cats.pickle", help="filename to save submissions to")
-@click.option("-l", "--limit", default=None, help="Maximum number of submissions to get, is occasionally 1-6 submissions over the limit")
+@click.option("-l", "--limit", default=None, help="Maximum number of submissions to get, may be off by a few, collects this amount from each sub in --subs")
 @click.option("--nobackup", default=False, help="Don't create backup of existing pickle before overwriting it")
 def scrape(subs, filename, limit, nobackup):
     """ Scrapes reddit for cat photos """
@@ -73,31 +76,54 @@ def scrape(subs, filename, limit, nobackup):
     if subs is None:
         subs = DEFAULT_SUBS
     else:
-        subs = subs.split(', ')
-    kittehs = []
-    
+        subs = subs.split(',')
+
     kittycounts = 0  # running total of how many cats we've grabbed
+
+
+
     for sub in subs:
         if limit:
-            newlist = get_cats(sub, limit-kittycounts)
+            kittehs = set()
+            while len(kittehs) <= limit:
+                newset = get_cats(sub, limit-kittycounts)
+                for kw in filtered_keywords:
+                    kittehs = [s for s in kittehs if kw not in s.url]
+                if len(kittehs) >= limit:
+                            break
         else:
-            newlist = get_cats(sub)
-        kittehs.extend(newlist)
-        kittycounts += len(newlist)
-        if kittycounts >= limit:
-            break
-    
-    
-    for kw in filtered_keywords:
-        goodkittehs = [s for s in kittehs if kw not in s.url]
+            newset = get_cats(sub)
 
-    print("\n\n>>>> Scraped", len(goodkittehs), "good kittehs <<<<\n")
+        kittehs = set()
+    
+
+        kittehs.update(newset)
+        kittycounts += len(newset)
+        print(len(kittehs),'\n',kittycounts)
+        
+
+        print(len(kittehs))
+
+        
+
+        
+    for kitteh in kittehs:
+        print(kitteh.title)
+
+    print(len(kittehs))
+    
+    
+
+    
+
+
+    print("\n\n>>>> Scraped", len(kittehs), "good kittehs <<<<\n")
 
     if not nobackup:
         pass
     
     with open(filename, 'wb') as f:
-        pickle.dump(goodkittehs, f)
+        pickle.dump(kittehs, f)
         
     
 
