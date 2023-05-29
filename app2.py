@@ -63,7 +63,7 @@ print('\n\n\n\n<----------------------------------------------------->\n\n\n\n')
 #---------------------
 
 @click.command()
-@click.option("--subs", default=None, help="Explicit list of subreddits to use")
+@click.option("--subs", default=None, help="Explicit list of subreddits to use. Format: subreddit1, subreddit2, subreddit3, etc")
 @click.option("-f", "--filename", default="cats.pickle", help="filename to save submissions to")
 @click.option("-l", "--limit", default=None, help="Maximum number of submissions to get, is occasionally 1-6 submissions over the limit")
 @click.option("--nobackup", default=False, help="Don't create backup of existing pickle before overwriting it")
@@ -72,6 +72,8 @@ def scrape(subs, filename, limit, nobackup):
     limit = int(limit)
     if subs is None:
         subs = DEFAULT_SUBS
+    else:
+        subs = subs.split(', ')
     kittehs = []
     
     kittycounts = 0  # running total of how many cats we've grabbed
