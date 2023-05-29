@@ -84,4 +84,4 @@ def api():
 
 
 if __name__ == "__main__":
-    app.run(host = '127.0.0.1', port = 5050)
+    app.run(host = getenv('HOST-ADDRESS'), port = 5050)
