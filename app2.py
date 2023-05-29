@@ -5,7 +5,6 @@ from os import getenv
 from time import sleep
 from random import choice
 from flask import Flask, render_template, jsonify, request
-import click
 
 load_dotenv()
 
