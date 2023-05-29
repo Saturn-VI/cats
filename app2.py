@@ -17,6 +17,7 @@ client_secret = getenv('SECRET')
 user_agent = getenv('USER-AGENT')
 password=getenv('PASSWORD')
 username=getenv('REDDIT-USERNAME')
+filtered_keywords = ["v.redd.it", "www.reddit.com"]
 
 reddit = praw.Reddit(
     client_id=client_id,
@@ -35,32 +36,27 @@ class Submission:
 
 outputs = []
 
-def get_cats(subreddit_name):
-    """ Returns a list of submission objects, with top submissions from the past 24 hours from subreddit_name"""
+def get_cats(subreddit_name, limit=None):
+    """ Returns a list of submission objects, with top submissions from the past 24 hours from subreddit_name
+    If **limit** is provided, then returns no more then that many items"""
     subreddit = reddit.subreddit(subreddit_name)
 
-    for result in subreddit.top(time_filter = "day"):
+    for result in subreddit.top(time_filter = "day", limit=limit):
         url = reddit.submission(result).url
         print(subreddit)
         print(result)
         print(result.title)
         print(url)
-        outputs.append(Submission(url, result.title))
+        if filtered_keywords[0] not in url and filtered_keywords[1] not in url:
+            outputs.append(Submission(url, result.title))
     return outputs
+
 
 DEFAULT_SUBS = ['cats', 'OneOrangeBraincell', 'CatPics', 'CatLoaf', 'C_AT', 
             'IllegallySmolCats', 'Kitten', 'CatsStandingUp', 'Blep', 
             'BlackCats', 'StandardIssueCat']
 
-#submissions = get_cats('CatPics')
-
-filtered_keywords = ["gallery", "v.redd.it", "www.reddit.com"]
-for kw in filtered_keywords:
-    submissions = [s for s in submissions if kw not in s.url]
-
 print('\n\n\n\n<----------------------------------------------------->\n\n\n\n')
-
-index_length = len(submissions)
 
 #---------------------
 # Scraper logic
@@ -68,18 +64,40 @@ index_length = len(submissions)
 
 @click.command()
 @click.option("--subs", default=None, help="Explicit list of subreddits to use")
-def scrape_config(*args, **kw):
-    return ("scrape", args, kw)
-
-def scrape(subs=None):
+@click.option("-f", "--filename", default="cats.pickle", help="filename to save submissions to")
+@click.option("-l", "--limit", default=None, help="Maximum number of submissions to get, is occasionally 1-6 submissions over the limit")
+@click.option("--nobackup", default=False, help="Don't create backup of existing pickle before overwriting it")
+def scrape(subs, filename, limit, nobackup):
     """ Scrapes reddit for cat photos """
+    limit = int(limit)
     if subs is None:
         subs = DEFAULT_SUBS
-    outputs = []
+    kittehs = []
+    
+    kittycounts = 0  # running total of how many cats we've grabbed
     for sub in subs:
-        outputs.extend(get_cats(sub))
-    with open("cats.pickle", 'wb') as f:
-        pickle.dump(outputs, f)
+        if limit:
+            newlist = get_cats(sub, limit-kittycounts)
+        else:
+            newlist = get_cats(sub)
+        kittehs.extend(newlist)
+        kittycounts += len(newlist)
+        if kittycounts >= limit:
+            break
+    
+    
+    for kw in filtered_keywords:
+        goodkittehs = [s for s in kittehs if kw not in s.url]
+
+    print("\n\n>>>> Scraped", len(goodkittehs), "good kittehs <<<<\n")
+
+    if not nobackup:
+        pass
+    
+    with open(filename, 'wb') as f:
+        pickle.dump(goodkittehs, f)
+        
+    
 
 #---------------------
 # Serving logic
@@ -90,10 +108,10 @@ def scrape(subs=None):
 @click.option("--port", default=5050, help="port to listen on")
 @click.option("--host", default=getenv('HOST-ADDRESS'), help="local host address to listen on")
 @click.option("--scrape", default=False, help="if this is set to true, cats.pickle is overwritten. Does not do anything if cats.pickle does not exist")
-def serve_config(*args, **kw):
+def serve(*args, **kw):
     return ("serve", args, kw)
 
-def serve(filename, port, host, scrape):
+def do_serve(filename, port, host, scrape):
     """ Launches a web server that gets random cat image through /api route """
 
     app = Flask(__name__, static_folder='static')
@@ -135,5 +153,4 @@ cli.add_command(serve)
 cli.add_command(scrape)
 
 if __name__ == "__main__": 
-    result = cli()
-    print(result)
+    cli()
