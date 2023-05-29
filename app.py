@@ -53,12 +53,14 @@ def get_cats(subreddit_choice):
 
 app = Flask(__name__, static_folder='static')
 
-#get_cats('cats')
-#get_cats('OneOrangeBraincell')
-get_cats('CatPics')
-#get_cats('CatLoaf')
+cat_subs = ['cats', 'OneOrangeBraincell', 'CatPics', 'CatLoaf', 'C_AT', 'IllegallySmolCats', 'Kitten', 'CatsStandingUp', 'Blep', 'BlackCats', 'StandardIssueCat']
+
+for sub in cat_subs:
+    get_cats(sub)
 
 submissions = [s for s in submissions if 'gallery' not in s.url]
+submissions = [s for s in submissions if 'v.redd.it' not in s.url]
+submissions = [s for s in submissions if 'www.reddit.com' not in s.url]
 
 print('\n\n\n\n<----------------------------------------------------->\n\n\n\n')
 
