@@ -68,7 +68,7 @@ print('\n\n\n\n<----------------------------------------------------->\n\n\n\n')
 @click.command()
 @click.option("--subs", default=None, help="Explicit list of subreddits to use. Format: subreddit1,subreddit2,subreddit3, etc. NO SPACES.")
 @click.option("-f", "--filename", default="cats.pickle", help="filename to save submissions to")
-@click.option("-l", "--limit", default=None, help="Maximum number of submissions to get, may be off by a few, collects this amount from each sub in --subs")
+@click.option("-l", "--limit", default=None, help="Maximum number of submissions to getcollects this amount from each sub in --subs")
 @click.option("--nobackup", default=False, help="Don't create backup of existing pickle before overwriting it")
 def scrape(subs, filename, limit, nobackup):
     """ Scrapes reddit for cat photos """
@@ -80,44 +80,38 @@ def scrape(subs, filename, limit, nobackup):
 
     kittycounts = 0  # running total of how many cats we've grabbed
 
-
+    kittehs = set()
 
     for sub in subs:
         if limit:
-            kittehs = set()
-            while len(kittehs) <= limit:
-                newset = get_cats(sub, limit-kittycounts)
-                for kw in filtered_keywords:
-                    kittehs = [s for s in kittehs if kw not in s.url]
-                if len(kittehs) >= limit:
-                            break
+            remaining = limit
+
+            results = get_cats(sub, remaining)
+            for kw in filtered_keywords:
+                results = [s for s in results if kw not in s.url]
+            remaining -= len(results)
+            kittehs.update(results)
+            print(len(kittehs))
+            if len(kittehs) <= 0:
+                break
+
+
+
         else:
-            newset = get_cats(sub)
+            kittehs.update(get_cats(sub))
+            kittehs = [s for s in kittehs if kw not in s.url]
 
-        kittehs = set()
-    
 
-        kittehs.update(newset)
-        kittycounts += len(newset)
-        print(len(kittehs),'\n',kittycounts)
-        
-
-        print(len(kittehs))
-
-        
-
-        
-    for kitteh in kittehs:
-        print(kitteh.title)
-
-    print(len(kittehs))
-    
-    
-
-    
-
+    if limit and len(kittehs) > limit:
+        subtraction_amount = len(kittehs) - limit
+        for i in range(subtraction_amount):
+            kittehs.pop()
+            print(f"{i+1} kittehs popped")
 
     print("\n\n>>>> Scraped", len(kittehs), "good kittehs <<<<\n")
+
+    for kitteh in kittehs:
+        print(kitteh.title)
 
     if not nobackup:
         pass
