@@ -135,4 +135,5 @@ cli.add_command(serve)
 cli.add_command(scrape)
 
 if __name__ == "__main__": 
-    cli()
+    result = cli()
+    print(result)
