@@ -1,8 +1,9 @@
 #cats
 import praw
 from dotenv import load_dotenv
-from os import getenv
+from os import getenv, rename
 from time import sleep
+from datetime import datetime
 from random import choice
 import pickle
 import os.path
@@ -78,8 +79,6 @@ def scrape(subs, filename, limit, nobackup):
     else:
         subs = subs.split(',')
 
-    kittycounts = 0  # running total of how many cats we've grabbed
-
     kittehs = set()
 
     for sub in subs:
@@ -114,7 +113,10 @@ def scrape(subs, filename, limit, nobackup):
         print(kitteh.title)
 
     if not nobackup:
-        pass
+        #rename file to time and date (with local time)
+        backup_time = datetime.now().replace(microsecond=0).isoformat()
+        #move file to pickle_backups
+
     
     with open(filename, 'wb') as f:
         pickle.dump(kittehs, f)
