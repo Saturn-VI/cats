@@ -138,7 +138,7 @@ def servename(port, host, scrape_subs): #MUST NOT BE PLAIN "scrape", that breaks
     # look for the saved submissions file, and if it doesn't exist, then invoke the scraper
     if not os.path.exists('cats.pickle') or scrape_subs:
         print("Scraping...")
-        scrape_function()
+        scrapename()
     
     # load the pickle
     with open('cats.pickle', "rb") as f:
