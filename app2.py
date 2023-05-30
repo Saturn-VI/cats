@@ -68,21 +68,26 @@ print('\n\n\n\n<----------------------------------------------------->\n\n\n\n')
 
 @click.command()
 @click.option("--subs", default=None, help="Explicit list of subreddits to use. Format: subreddit1,subreddit2,subreddit3, etc. NO SPACES.")
-@click.option("-f", "--filename", default="cats.pickle", help="filename to save submissions to")
-@click.option("-l", "--limit", default=None, help="Maximum number of submissions to getcollects this amount from each sub in --subs")
+# @click.option("-f", "--filename", default="cats.pickle", help="filename to save submissions to [DEPRECATED]")
+@click.option("-l", "--limit", default=None, help="Maximum number of submissions to get. Collects this amount from each sub in --subs")
 @click.option("--nobackup", default=False, help="Don't create backup of existing pickle before overwriting it")
-def scrape(subs, filename, limit, nobackup):
+def scrape(subs, limit, nobackup):
     """ Scrapes reddit for cat photos """
-    limit = int(limit)
+
+
+    if limit != None:
+        limit = int(limit)
+
     if subs is None:
         subs = DEFAULT_SUBS
     else:
         subs = subs.split(',')
 
-    kittehs = set()
 
-    for sub in subs:
-        if limit:
+    
+    if limit:
+        kittehs = set()
+        for sub in subs:
             remaining = limit
 
             results = get_cats(sub, remaining)
@@ -90,15 +95,17 @@ def scrape(subs, filename, limit, nobackup):
                 results = [s for s in results if kw not in s.url]
             remaining -= len(results)
             kittehs.update(results)
-            print(len(kittehs))
+
             if len(kittehs) <= 0:
                 break
 
-
-
-        else:
-            kittehs.update(get_cats(sub))
-            kittehs = [s for s in kittehs if kw not in s.url]
+    else:
+        kittehs = set()
+        for sub in subs:
+            results = get_cats(sub, None)
+            for kw in filtered_keywords:
+                results = [s for s in results if kw not in s.url]
+            kittehs.update(results)
 
 
     if limit and len(kittehs) > limit:
@@ -114,11 +121,13 @@ def scrape(subs, filename, limit, nobackup):
 
     if not nobackup:
         #rename file to time and date (with local time)
-        backup_time = datetime.now().replace(microsecond=0).isoformat()
+        backup_time = datetime.now().strftime("%Y-%m-%d-%H-%M")
+        print(backup_time)
         #move file to pickle_backups
-
+        rename('cats.pickle', f"pickle_backups/{backup_time}.pickle")
+        print('moved pickle')
     
-    with open(filename, 'wb') as f:
+    with open('cats.pickle', 'wb') as f:
         pickle.dump(kittehs, f)
         
     
