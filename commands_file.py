@@ -1,6 +1,6 @@
 import praw
 from dotenv import load_dotenv
-from os import getenv, rename
+from os import getenv, rename, renames
 from time import sleep
 from datetime import datetime
 from random import choice
@@ -89,10 +89,10 @@ def scrapename(subs=None, limit=None, nobackup=False):
 
     if not nobackup:
         #rename file to time and date (with local time)
-        backup_time = datetime.now().strftime("%Y-%m-%d-%H-%M")
+        backup_time = datetime.now().strftime("%Y-%m-%d-%H%M")
         print(backup_time)
         #move file to pickle_backups
-        rename('cats.pickle', f"pickle_backups/{backup_time}.pickle")
+        renames('cats.pickle', f'pickle_backups\{backup_time}.pickle')
         print('moved pickle')
     
     with open('cats.pickle', 'wb') as f:
