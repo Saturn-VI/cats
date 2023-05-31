@@ -39,7 +39,7 @@ def scrape(subs, limit, nobackup):
 # @click.option("-f", "--filename", default="cats.pickle", help="file containing all the submissions") obsolete at the moment due to line 71
 @click.option("--port", default=5050, help="port to listen on")
 @click.option("--host", default=getenv('HOST-ADDRESS'), help="local host address to listen on")
-@click.option("--scrape_subs", default=True, help="if this is set to false, old cats.pickle is used and scrape() is not called (this flag has no effect on first run)")
+@click.option("--scrape_subs", default=False, help="if this is set to false, old cats.pickle is used and scrape() is not called (this flag has no effect on first run)")
 def serve(port, host, scrape_subs): #MUST NOT BE PLAIN "scrape", that breaks things
     servename(port, host, scrape_subs)
 
